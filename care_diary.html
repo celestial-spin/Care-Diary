@@ -734,6 +734,7 @@
     <div class="header-title-wrap">
       <h1 id="header-title">Care Diary</h1>
       <div class="subtitle" id="header-subtitle">Loading…</div>
+      <div style="font-size:10px;opacity:0.4;font-family:monospace">v3</div>
     </div>
   </div>
   <div class="header-actions">
@@ -1353,6 +1354,7 @@ window.submitEntry = async function(e) {
   const resetBtn = () => { btn.textContent = 'Save Entry'; btn.disabled = false; };
   const fallback = setTimeout(resetBtn, 5000);
 
+  // Snapshot form values immediately before any async work
   const date = document.getElementById('f-date').value;
   const time = document.getElementById('f-time').value;
   const cat = document.getElementById('f-category').value;
