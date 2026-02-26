@@ -1378,10 +1378,10 @@ window.submitEntry = async function(e) {
   } catch(err) {
     showToast('Error saving: ' + err.message);
     console.error(err);
+  } finally {
+    btn.textContent = 'Save Entry';
+    btn.disabled = false;
   }
-
-  btn.textContent = 'Save Entry';
-  btn.disabled = false;
 };
 
 // ═══════════════════════════════════════════════════
@@ -1612,10 +1612,10 @@ window.saveEdit = async function(event) {
   } catch(err) {
     showToast('Error saving: ' + err.message);
     console.error(err);
+  } finally {
+    btn.textContent = 'Save changes';
+    btn.disabled = false;
   }
-
-  btn.textContent = 'Save changes';
-  btn.disabled = false;
 };
 
 // Close modal on Escape key
