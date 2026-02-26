@@ -1349,6 +1349,10 @@ window.submitEntry = async function(e) {
   btn.textContent = 'Saving…';
   btn.disabled = true;
 
+  // Fallback: always reset button after 5 seconds no matter what
+  const resetBtn = () => { btn.textContent = 'Save Entry'; btn.disabled = false; };
+  const fallback = setTimeout(resetBtn, 5000);
+
   const date = document.getElementById('f-date').value;
   const time = document.getElementById('f-time').value;
   const cat = document.getElementById('f-category').value;
@@ -1379,8 +1383,8 @@ window.submitEntry = async function(e) {
     showToast('Error saving: ' + err.message);
     console.error(err);
   } finally {
-    btn.textContent = 'Save Entry';
-    btn.disabled = false;
+    clearTimeout(fallback);
+    resetBtn();
   }
 };
 
