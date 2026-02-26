@@ -1318,9 +1318,22 @@ document.getElementById('f-followup').addEventListener('change', function() {
 });
 
 window.clearForm = function() {
-  document.getElementById('entry-form').reset();
+  // Explicitly reset every field rather than relying on form.reset()
+  document.getElementById('f-who').value = '';
+  document.getElementById('f-category').value = '';
+  document.getElementById('f-severity').value = '';
+  document.getElementById('f-summary').value = '';
+  document.getElementById('f-notes').value = '';
+  document.getElementById('f-followup').value = 'no';
+  document.getElementById('f-followup-note').value = '';
+  document.getElementById('f-org').value = '';
+  document.getElementById('f-method').value = '';
+  document.getElementById('f-contact-person').value = '';
+  document.getElementById('f-ref').value = '';
+  // Hide conditional fields
   onCategoryChange();
   document.getElementById('followup-note-field').style.display = 'none';
+  // Reset date/time to now
   setDateTimeNow();
 };
 
