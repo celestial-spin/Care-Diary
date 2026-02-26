@@ -1,0 +1,1975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>Care Diary</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f7f6f3;
+    --surface: #ffffff;
+    --surface2: #f0efe9;
+    --border: #dddbd3;
+    --border-strong: #b8b5aa;
+    --text: #1a1917;
+    --text-muted: #6b6860;
+    --text-faint: #9e9b94;
+    --accent: #1d4ed8;
+    --accent-light: #eff6ff;
+    --accent-border: #93c5fd;
+    --red: #b91c1c;
+    --red-light: #fef2f2;
+    --red-border: #fca5a5;
+    --amber: #92400e;
+    --amber-light: #fffbeb;
+    --amber-border: #fcd34d;
+    --green: #14532d;
+    --green-light: #f0fdf4;
+    --green-border: #86efac;
+    --purple: #581c87;
+    --purple-light: #faf5ff;
+    --purple-border: #d8b4fe;
+    --teal: #134e4a;
+    --teal-light: #f0fdfa;
+    --teal-border: #5eead4;
+    --font: 'IBM Plex Sans', sans-serif;
+    --mono: 'IBM Plex Mono', monospace;
+    --radius: 6px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+    --shadow-lg: 0 4px 12px rgba(0,0,0,0.1);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  header {
+    background: var(--text);
+    color: white;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  header h1 {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  header .subtitle {
+    font-size: 11px;
+    font-family: var(--mono);
+    color: #9ca3af;
+    margin-top: 1px;
+  }
+  .header-actions { display: flex; gap: 8px; }
+  .btn-header {
+    background: rgba(255,255,255,0.12);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: var(--radius);
+    padding: 6px 12px;
+    font-size: 12px;
+    font-family: var(--font);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-header:hover { background: rgba(255,255,255,0.2); }
+
+  /* ── Config Banner ── */
+  #config-banner {
+    background: #fef3c7;
+    border-bottom: 2px solid #f59e0b;
+    padding: 12px 20px;
+    font-size: 13px;
+    color: #78350f;
+  }
+  #config-banner strong { font-weight: 600; }
+  #config-banner code {
+    font-family: var(--mono);
+    background: rgba(0,0,0,0.08);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 12px;
+  }
+
+  /* ── Layout ── */
+  .container { max-width: 820px; margin: 0 auto; padding: 20px; }
+
+  /* ── Status bar ── */
+  #status-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-family: var(--mono);
+    color: var(--text-faint);
+    margin-bottom: 16px;
+  }
+  .status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #9ca3af;
+    transition: background 0.3s;
+  }
+  .status-dot.connected { background: #22c55e; }
+  .status-dot.error { background: #ef4444; }
+
+  /* ── Tabs ── */
+  .tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 2px solid var(--border);
+    margin-bottom: 20px;
+  }
+  .tab {
+    padding: 10px 18px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* ── Entry Form ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+    margin-bottom: 16px;
+  }
+  .card-title {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .form-row {
+    display: grid;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .form-row.cols-2 { grid-template-columns: 1fr 1fr; }
+  .form-row.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+  @media (max-width: 540px) {
+    .form-row.cols-2,
+    .form-row.cols-3 { grid-template-columns: 1fr; }
+  }
+
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text-muted);
+  }
+  input, select, textarea {
+    font-family: var(--font);
+    font-size: 14px;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 9px 11px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    width: 100%;
+    -webkit-appearance: none;
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(29,78,216,0.1);
+  }
+  textarea { resize: vertical; min-height: 80px; }
+  select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b6860' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 30px; }
+
+  /* Category colours applied to select options via JS */
+  .category-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+
+  /* Contact-specific fields */
+  #contact-fields { display: none; }
+  #contact-fields.visible { display: contents; }
+  #severity-field { display: none; }
+  #severity-field.visible { display: flex; flex-direction: column; gap: 4px; }
+
+  /* ── Buttons ── */
+  .btn {
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 10px 20px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+    letter-spacing: 0.02em;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: white;
+  }
+  .btn-primary:hover { background: #1e40af; }
+  .btn-primary:active { transform: scale(0.98); }
+  .btn-secondary {
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover { background: var(--border); }
+  .btn-danger {
+    background: var(--red-light);
+    color: var(--red);
+    border: 1px solid var(--red-border);
+  }
+  .btn-danger:hover { background: #fee2e2; }
+  .btn-sm { padding: 5px 10px; font-size: 12px; }
+
+  .form-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* ── Filters ── */
+  .filter-bar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: flex-end;
+  }
+  .filter-bar .field { flex: 1; min-width: 130px; }
+  .filter-bar label { font-size: 10px; }
+
+  /* ── Entry List ── */
+  .entry-count {
+    font-size: 12px;
+    font-family: var(--mono);
+    color: var(--text-faint);
+    margin-bottom: 12px;
+  }
+
+  .entry-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 10px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: box-shadow 0.15s;
+  }
+  .entry-card:hover { box-shadow: var(--shadow-lg); }
+
+  .entry-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .entry-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+  }
+  .entry-datetime {
+    font-size: 11px;
+    font-family: var(--mono);
+    color: var(--text-faint);
+  }
+  .entry-summary {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .entry-who {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+  .entry-chevron {
+    color: var(--text-faint);
+    font-size: 16px;
+    transition: transform 0.2s;
+    flex-shrink: 0;
+  }
+  .entry-card.expanded .entry-chevron { transform: rotate(180deg); }
+
+  .entry-body {
+    display: none;
+    padding: 0 14px 14px;
+    border-top: 1px solid var(--border);
+    margin-top: 0;
+  }
+  .entry-card.expanded .entry-body { display: block; }
+
+  .entry-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 20px;
+    margin-top: 12px;
+    margin-bottom: 12px;
+  }
+  @media (max-width: 480px) {
+    .entry-detail-grid { grid-template-columns: 1fr; }
+  }
+  .detail-item {}
+  .detail-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text-faint);
+    margin-bottom: 2px;
+  }
+  .detail-value {
+    font-size: 13px;
+    color: var(--text);
+  }
+  .notes-block {
+    background: var(--surface2);
+    border-radius: 4px;
+    padding: 10px 12px;
+    font-size: 13px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    margin-top: 10px;
+  }
+  .followup-block {
+    background: var(--amber-light);
+    border: 1px solid var(--amber-border);
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 12px;
+    margin-top: 8px;
+    color: var(--amber);
+  }
+  .followup-block strong { font-weight: 600; }
+  .entry-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  /* ── Category colours ── */
+  .cat-behaviour { background: var(--red-light); color: var(--red); border: 1px solid var(--red-border); }
+  .cat-incident { background: #fff1f2; color: #9f1239; border: 1px solid #fda4af; }
+  .cat-fall { background: var(--amber-light); color: var(--amber); border: 1px solid var(--amber-border); }
+  .cat-medication { background: var(--purple-light); color: var(--purple); border: 1px solid var(--purple-border); }
+  .cat-pain { background: #fdf4ff; color: #6b21a8; border: 1px solid #e9d5ff; }
+  .cat-communication { background: var(--teal-light); color: var(--teal); border: 1px solid var(--teal-border); }
+  .cat-contact-authority { background: var(--accent-light); color: #1e3a8a; border: 1px solid var(--accent-border); }
+  .cat-contact-medical { background: var(--green-light); color: var(--green); border: 1px solid var(--green-border); }
+  .cat-care-observation { background: #f8fafc; color: #334155; border: 1px solid #cbd5e1; }
+  .cat-other { background: var(--surface2); color: var(--text-muted); border: 1px solid var(--border); }
+
+  /* ── Severity badges ── */
+  .sev-mild { background: var(--green-light); color: var(--green); border: 1px solid var(--green-border); }
+  .sev-moderate { background: var(--amber-light); color: var(--amber); border: 1px solid var(--amber-border); }
+  .sev-significant { background: var(--red-light); color: var(--red); border: 1px solid var(--red-border); }
+
+  /* ── Export tab ── */
+  .export-section { margin-bottom: 24px; }
+  .export-section h3 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .export-section p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+  .export-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  /* ── Stats ── */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+    text-align: center;
+  }
+  .stat-number {
+    font-size: 28px;
+    font-weight: 600;
+    font-family: var(--mono);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .stat-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+  }
+
+  /* ── Loading ── */
+  .loading {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-faint);
+    font-family: var(--mono);
+    font-size: 13px;
+  }
+
+  /* ── Empty state ── */
+  .empty-state {
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--text-muted);
+  }
+  .empty-state .icon { font-size: 36px; margin-bottom: 12px; }
+  .empty-state h3 { font-size: 16px; margin-bottom: 6px; }
+  .empty-state p { font-size: 13px; color: var(--text-faint); }
+
+  /* ── Toast ── */
+  #toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--text);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    z-index: 999;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    white-space: nowrap;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ── Mic button ── */
+  .field-with-mic {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .input-mic-wrap {
+    display: flex;
+    gap: 6px;
+    align-items: flex-start;
+  }
+  .input-mic-wrap input,
+  .input-mic-wrap textarea {
+    flex: 1;
+    min-width: 0;
+  }
+  .mic-btn {
+    flex-shrink: 0;
+    width: 38px;
+    height: 38px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    transition: all 0.15s;
+    padding: 0;
+    line-height: 1;
+    position: relative;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  .mic-btn:hover { background: var(--border); }
+  .mic-btn.recording {
+    background: var(--red-light);
+    border-color: var(--red-border);
+    animation: mic-pulse 1s ease-in-out infinite;
+  }
+  @keyframes mic-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+  }
+  .mic-btn-textarea {
+    height: 38px;
+    align-self: flex-start;
+    margin-top: 1px;
+  }
+  /* Recording status banner */
+  #mic-status {
+    display: none;
+    position: fixed;
+    top: 62px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--red);
+    color: white;
+    padding: 7px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    z-index: 200;
+    white-space: nowrap;
+    box-shadow: var(--shadow-lg);
+    letter-spacing: 0.03em;
+    align-items: center;
+    gap: 7px;
+  }
+  #mic-status.visible { display: flex; }
+  #mic-status .blink {
+    width: 8px; height: 8px;
+    background: white;
+    border-radius: 50%;
+    animation: blink 1s step-start infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+  #no-speech-msg {
+    display: none;
+    background: var(--amber-light);
+    border: 1px solid var(--amber-border);
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--amber);
+    margin-bottom: 12px;
+  }
+
+  /* ── Edit modal ── */
+  #edit-modal-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 300;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  #edit-modal-backdrop.open {
+    display: flex;
+  }
+  #edit-modal {
+    background: var(--surface);
+    width: 100%;
+    max-width: 820px;
+    max-height: 92vh;
+    border-radius: 14px 14px 0 0;
+    display: flex;
+    flex-direction: column;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+    box-shadow: 0 -8px 30px rgba(0,0,0,0.15);
+  }
+  #edit-modal-backdrop.open #edit-modal {
+    transform: translateY(0);
+  }
+  .modal-handle {
+    width: 36px;
+    height: 4px;
+    background: var(--border-strong);
+    border-radius: 2px;
+    margin: 12px auto 0;
+    flex-shrink: 0;
+  }
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px 12px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .modal-header h2 {
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .modal-close {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    width: 32px;
+    height: 32px;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    line-height: 1;
+    padding: 0;
+  }
+  .modal-close:hover { background: var(--border); }
+  .modal-body {
+    overflow-y: auto;
+    padding: 16px 20px;
+    flex: 1;
+    -webkit-overflow-scrolling: touch;
+  }
+  .modal-footer {
+    padding: 12px 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    flex-shrink: 0;
+    background: var(--surface);
+  }
+  /* Edited badge on entry cards */
+  .edited-badge {
+    font-size: 10px;
+    font-family: var(--mono);
+    color: var(--text-faint);
+    margin-left: 6px;
+  }
+
+  /* ── Print styles ── */
+  @media print {
+    header, .tabs, .filter-bar, .form-actions, .entry-actions, #add-tab, #export-tab { display: none !important; }
+    .entry-body { display: block !important; }
+    .entry-chevron { display: none; }
+    body { background: white; }
+    .entry-card { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; }
+    #print-header { display: block !important; }
+  }
+  #print-header { display: none; }
+
+  /* ── Settings tab ── */
+  .settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .settings-row:last-child { border-bottom: none; }
+  .settings-label { font-size: 14px; font-weight: 500; }
+  .settings-desc { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .settings-input { width: 280px; }
+  @media (max-width: 540px) {
+    .settings-row { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .settings-input { width: 100%; }
+  }
+
+  /* ── Follow-up filter pill ── */
+  .followup-badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 10px;
+    background: var(--amber-light);
+    color: var(--amber);
+    border: 1px solid var(--amber-border);
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+</style>
+</head>
+<body>
+
+<div id="print-header" style="padding:20px; border-bottom: 2px solid #1a1917; margin-bottom:20px;">
+  <h1 id="print-title" style="font-size:20px; font-weight:700;"></h1>
+  <p id="print-subtitle" style="font-size:13px; color:#6b6860; margin-top:4px;"></p>
+</div>
+
+<header>
+  <div>
+    <div class="header-title-wrap">
+      <h1 id="header-title">Care Diary</h1>
+      <div class="subtitle" id="header-subtitle">Loading…</div>
+      <div style="font-size:10px;opacity:0.4;font-family:monospace">v5</div>
+    </div>
+  </div>
+  <div class="header-actions">
+    <button class="btn-header" onclick="printFiltered()">🖨 Print</button>
+    <button class="btn-header" onclick="exportCSV()">⬇ CSV</button>
+  </div>
+</header>
+
+<div id="mic-status"><span class="blink"></span> <span id="mic-status-text">Listening…</span> — tap 🎤 again to stop</div>
+
+<div id="config-banner">
+  <strong>⚠ Setup required:</strong> This app needs your Firebase config to save data. 
+  Go to <strong>Settings</strong> tab and enter your Firebase project details, 
+  or open this file in a text editor and replace the placeholder values in the <code>FIREBASE_CONFIG</code> section near the top of the script.
+  <a href="#" onclick="document.querySelector('.tab[data-tab=settings]').click(); return false;" 
+     style="color:#92400e; font-weight:600; margin-left:6px;">Go to Settings →</a>
+</div>
+
+<div class="container">
+  <div id="status-bar">
+    <div class="status-dot" id="status-dot"></div>
+    <span id="status-text">Not connected</span>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="log" onclick="switchTab('log')">Log Entry</div>
+    <div class="tab" data-tab="diary" onclick="switchTab('diary')">Diary <span id="followup-count" class="followup-badge" style="display:none"></span></div>
+    <div class="tab" data-tab="export" onclick="switchTab('export')">Export</div>
+    <div class="tab" data-tab="settings" onclick="switchTab('settings')">Settings</div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ LOG TAB -->
+  <div id="tab-log">
+    <div class="card">
+      <div class="card-title">New Entry</div>
+      <div id="no-speech-msg">
+        🎤 Voice input is not supported in this browser. Use Chrome or Safari on your phone for microphone support.
+      </div>
+      <form id="entry-form" onsubmit="submitEntry(event)">
+
+        <div class="form-row cols-3">
+          <div class="field">
+            <label>Date</label>
+            <input type="date" id="f-date" required>
+          </div>
+          <div class="field">
+            <label>Time</label>
+            <input type="time" id="f-time" required>
+          </div>
+          <div class="field">
+            <label>Logged by</label>
+            <div class="input-mic-wrap">
+              <select id="f-who" required>
+                <option value="">— select —</option>
+                <option value="Andrea">Andrea</option>
+                <option value="Philip">Philip</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row cols-2">
+          <div class="field">
+            <label>Category</label>
+            <select id="f-category" onchange="onCategoryChange()" required>
+              <option value="">— select —</option>
+              <option value="behaviour">Behaviour / OCD episode</option>
+              <option value="incident">Incident / accident</option>
+              <option value="fall">Fall or near-miss</option>
+              <option value="medication">Medication change / reaction</option>
+              <option value="pain">Pain / comfort</option>
+              <option value="communication">Communication difficulty</option>
+              <option value="contact-authority">Contact — Authority (ICB / council / legal)</option>
+              <option value="contact-medical">Contact — Medical (GP / hospital / specialist)</option>
+              <option value="care-observation">Care home observation</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="field" id="severity-field">
+            <label>Severity</label>
+            <select id="f-severity">
+              <option value="">— select —</option>
+              <option value="mild">Mild</option>
+              <option value="moderate">Moderate</option>
+              <option value="significant">Significant</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Contact-specific fields -->
+        <div id="contact-fields">
+          <div class="form-row cols-2">
+            <div class="field">
+              <label>Organisation</label>
+              <select id="f-org">
+                <option value="">— select —</option>
+                <option>Black Country ICB</option>
+                <option>Dudley Adult Social Care</option>
+                <option>GP Surgery</option>
+                <option>Hospital — Ward</option>
+                <option>Hospital — Consultant</option>
+                <option>MG Specialist / Neurologist</option>
+                <option>Nursing Home</option>
+                <option>Beacon CHC</option>
+                <option>Solicitor</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Method</label>
+              <select id="f-method">
+                <option value="">— select —</option>
+                <option value="phone">Phone call</option>
+                <option value="email">Email</option>
+                <option value="letter">Letter / post</option>
+                <option value="in-person">In person</option>
+                <option value="video">Video call</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row cols-2">
+            <div class="field field-with-mic">
+              <label>Person spoken to (name &amp; role if known)</label>
+              <div class="input-mic-wrap">
+                <input type="text" id="f-contact-person" placeholder="e.g. Jane Smith, CHC Nurse">
+                <button type="button" class="mic-btn" onclick="toggleMic('f-contact-person', this)" title="Dictate">🎤</button>
+              </div>
+            </div>
+            <div class="field field-with-mic">
+              <label>Reference number</label>
+              <div class="input-mic-wrap">
+                <input type="text" id="f-ref" placeholder="If given">
+                <button type="button" class="mic-btn" onclick="toggleMic('f-ref', this)" title="Dictate">🎤</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field field-with-mic">
+            <label>Summary <span style="font-weight:400;text-transform:none;letter-spacing:0">(one line — appears in the diary list)</span></label>
+            <div class="input-mic-wrap">
+              <input type="text" id="f-summary" placeholder="Brief description" required maxlength="120">
+              <button type="button" class="mic-btn" onclick="toggleMic('f-summary', this)" title="Dictate">🎤</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field field-with-mic">
+            <label>Full notes</label>
+            <div class="input-mic-wrap">
+              <textarea id="f-notes" placeholder="Full detail — include what happened, who was present, what was said, what intervention was required, outcome…" rows="4"></textarea>
+              <button type="button" class="mic-btn mic-btn-textarea" onclick="toggleMic('f-notes', this)" title="Dictate">🎤</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row cols-2">
+          <div class="field">
+            <label>Follow-up required?</label>
+            <select id="f-followup">
+              <option value="no">No</option>
+              <option value="yes">Yes</option>
+            </select>
+          </div>
+          <div class="field field-with-mic" id="followup-note-field" style="display:none">
+            <label>Follow-up action</label>
+            <div class="input-mic-wrap">
+              <input type="text" id="f-followup-note" placeholder="What needs to happen?">
+              <button type="button" class="mic-btn" onclick="toggleMic('f-followup-note', this)" title="Dictate">🎤</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="clearForm()">Clear</button>
+          <button type="submit" class="btn btn-primary" id="submit-btn">Save Entry</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ DIARY TAB -->
+  <div id="tab-diary" style="display:none">
+    <div class="filter-bar">
+      <div class="field">
+        <label>From date</label>
+        <input type="date" id="filter-from" onchange="applyFilters()">
+      </div>
+      <div class="field">
+        <label>To date</label>
+        <input type="date" id="filter-to" onchange="applyFilters()">
+      </div>
+      <div class="field">
+        <label>Category</label>
+        <select id="filter-cat" onchange="applyFilters()">
+          <option value="">All categories</option>
+          <option value="behaviour">Behaviour</option>
+          <option value="incident">Incident</option>
+          <option value="fall">Fall / near-miss</option>
+          <option value="medication">Medication</option>
+          <option value="pain">Pain</option>
+          <option value="communication">Communication</option>
+          <option value="contact-authority">Contact — Authority</option>
+          <option value="contact-medical">Contact — Medical</option>
+          <option value="care-observation">Care observation</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Show</label>
+        <select id="filter-followup" onchange="applyFilters()">
+          <option value="all">All entries</option>
+          <option value="followup">Follow-up required only</option>
+        </select>
+      </div>
+      <button class="btn btn-secondary btn-sm" onclick="clearFilters()" style="align-self:flex-end;white-space:nowrap">Clear filters</button>
+    </div>
+
+    <div id="entry-count" class="entry-count"></div>
+    <div id="entries-list">
+      <div class="loading">Loading entries…</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ EXPORT TAB -->
+  <div id="tab-export" style="display:none">
+    <div class="card">
+      <div class="card-title">Export for CHC Review</div>
+
+      <div class="export-section">
+        <h3>Report options</h3>
+        <p>The printed and CSV reports use the same date/category filters set in the Diary tab. Set your filters there first, then come here to export.</p>
+
+        <div class="form-row cols-2">
+          <div class="field">
+            <label>Patient name (for report header)</label>
+            <input type="text" id="export-patient" placeholder="e.g. Margaret Smith">
+          </div>
+          <div class="field">
+            <label>Report period description</label>
+            <input type="text" id="export-period" placeholder="e.g. 1 Jan 2025 – 31 Mar 2025">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label>Prepared by</label>
+            <input type="text" id="export-preparer" placeholder="e.g. Family of Margaret Smith">
+          </div>
+        </div>
+      </div>
+
+      <div class="export-section">
+        <h3>Summary statistics</h3>
+        <div id="export-stats" class="stats-grid">
+          <div class="loading">Load diary first</div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-secondary" onclick="exportCSV()">⬇ Download CSV</button>
+        <button class="btn btn-primary" onclick="printFiltered()">🖨 Print / Save as PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ SETTINGS TAB -->
+  <div id="tab-settings" style="display:none">
+    <div class="card">
+      <div class="card-title">Firebase Configuration</div>
+      <p style="font-size:13px; color:var(--text-muted); margin-bottom:16px; line-height:1.6;">
+        This app uses Google Firebase (free tier) to store diary entries so all family members see the same data.
+        Follow the setup guide below, then paste your project's config values here.
+      </p>
+
+      <div class="settings-row">
+        <div><div class="settings-label">API Key</div></div>
+        <input type="text" class="settings-input" id="cfg-apiKey" placeholder="AIzaSy…">
+      </div>
+      <div class="settings-row">
+        <div><div class="settings-label">Auth Domain</div></div>
+        <input type="text" class="settings-input" id="cfg-authDomain" placeholder="your-project.firebaseapp.com">
+      </div>
+      <div class="settings-row">
+        <div><div class="settings-label">Project ID</div></div>
+        <input type="text" class="settings-input" id="cfg-projectId" placeholder="your-project-id">
+      </div>
+      <div class="settings-row">
+        <div><div class="settings-label">App ID</div></div>
+        <input type="text" class="settings-input" id="cfg-appId" placeholder="1:123456789:web:abc…">
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-primary" onclick="saveFirebaseConfig()">Save &amp; Connect</button>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <div class="card-title">Firebase Setup Guide</div>
+      <div style="font-size:13px; line-height:1.8; color:var(--text-muted);">
+        <p style="margin-bottom:12px;">This is a one-time 10-minute setup. You only need to do this once — all family members then just open the page.</p>
+        <ol style="padding-left:20px; display:flex; flex-direction:column; gap:8px;">
+          <li>Go to <a href="https://console.firebase.google.com" target="_blank" style="color:var(--accent)">console.firebase.google.com</a> and sign in with a Google account.</li>
+          <li>Click <strong>Add project</strong> → give it a name (e.g. "care-diary") → disable Google Analytics → <strong>Create project</strong>.</li>
+          <li>In the project overview, click the <strong>&lt;/&gt;</strong> (Web) icon to add a web app → give it a nickname → click <strong>Register app</strong>.</li>
+          <li>You'll see a <code>firebaseConfig</code> object. Copy the values for <strong>apiKey</strong>, <strong>authDomain</strong>, <strong>projectId</strong>, and <strong>appId</strong> into the fields above.</li>
+          <li>In the left sidebar, go to <strong>Build → Firestore Database</strong> → <strong>Create database</strong> → choose <strong>Start in test mode</strong> → select a region → <strong>Enable</strong>.</li>
+          <li>Click <strong>Save &amp; Connect</strong> above. The status dot in the top-left of the diary should turn green.</li>
+          <li>Share this HTML file (or host it on a free service like GitHub Pages or Netlify) with other family members. They enter the same Firebase config values in their Settings tab.</li>
+        </ol>
+        <p style="margin-top:12px;"><strong>Note on security:</strong> Test mode allows open access for 30 days. Before that expires, go to Firestore → Rules and set rules to restrict to authenticated users, or ask a technically-minded person to help.</p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <div class="card-title">Preferences</div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-label">Patient name</div>
+          <div class="settings-desc">Shown in the header and export reports</div>
+        </div>
+        <input type="text" class="settings-input" id="pref-patient" placeholder="e.g. Margaret">
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-primary" onclick="savePreferences()">Save preferences</button>
+      </div>
+    </div>
+  </div>
+</div><!-- /container -->
+
+<div id="edit-modal-backdrop" onclick="closeEditModal(event)">
+  <div id="edit-modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <h2>Edit Entry</h2>
+      <button class="modal-close" onclick="closeEditModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="edit-form" onsubmit="saveEdit(event)">
+        <input type="hidden" id="e-id">
+
+        <div class="form-row cols-3">
+          <div class="field">
+            <label>Date</label>
+            <input type="date" id="e-date" required>
+          </div>
+          <div class="field">
+            <label>Time</label>
+            <input type="time" id="e-time" required>
+          </div>
+          <div class="field">
+            <label>Logged by</label>
+            <select id="e-who" required>
+              <option value="">— select —</option>
+              <option value="Andrea">Andrea</option>
+              <option value="Philip">Philip</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row cols-2">
+          <div class="field">
+            <label>Category</label>
+            <select id="e-category" onchange="onEditCategoryChange()" required>
+              <option value="">— select —</option>
+              <option value="behaviour">Behaviour / OCD episode</option>
+              <option value="incident">Incident / accident</option>
+              <option value="fall">Fall or near-miss</option>
+              <option value="medication">Medication change / reaction</option>
+              <option value="pain">Pain / comfort</option>
+              <option value="communication">Communication difficulty</option>
+              <option value="contact-authority">Contact — Authority (ICB / council / legal)</option>
+              <option value="contact-medical">Contact — Medical (GP / hospital / specialist)</option>
+              <option value="care-observation">Care home observation</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="field" id="e-severity-field" style="display:none">
+            <label>Severity</label>
+            <select id="e-severity">
+              <option value="">— select —</option>
+              <option value="mild">Mild</option>
+              <option value="moderate">Moderate</option>
+              <option value="significant">Significant</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="e-contact-fields" style="display:none">
+          <div class="form-row cols-2">
+            <div class="field">
+              <label>Organisation</label>
+              <select id="e-org">
+                <option value="">— select —</option>
+                <option>Black Country ICB</option>
+                <option>Dudley Adult Social Care</option>
+                <option>GP Surgery</option>
+                <option>Hospital — Ward</option>
+                <option>Hospital — Consultant</option>
+                <option>MG Specialist / Neurologist</option>
+                <option>Nursing Home</option>
+                <option>Beacon CHC</option>
+                <option>Solicitor</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Method</label>
+              <select id="e-method">
+                <option value="">— select —</option>
+                <option value="phone">Phone call</option>
+                <option value="email">Email</option>
+                <option value="letter">Letter / post</option>
+                <option value="in-person">In person</option>
+                <option value="video">Video call</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row cols-2">
+            <div class="field field-with-mic">
+              <label>Person spoken to</label>
+              <div class="input-mic-wrap">
+                <input type="text" id="e-contact-person">
+                <button type="button" class="mic-btn" onclick="toggleMic('e-contact-person', this)" title="Dictate">🎤</button>
+              </div>
+            </div>
+            <div class="field field-with-mic">
+              <label>Reference number</label>
+              <div class="input-mic-wrap">
+                <input type="text" id="e-ref">
+                <button type="button" class="mic-btn" onclick="toggleMic('e-ref', this)" title="Dictate">🎤</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field field-with-mic">
+            <label>Summary</label>
+            <div class="input-mic-wrap">
+              <input type="text" id="e-summary" required maxlength="120">
+              <button type="button" class="mic-btn" onclick="toggleMic('e-summary', this)" title="Dictate">🎤</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field field-with-mic">
+            <label>Full notes</label>
+            <div class="input-mic-wrap">
+              <textarea id="e-notes" rows="4"></textarea>
+              <button type="button" class="mic-btn mic-btn-textarea" onclick="toggleMic('e-notes', this)" title="Dictate">🎤</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row cols-2">
+          <div class="field">
+            <label>Follow-up required?</label>
+            <select id="e-followup" onchange="onEditFollowupChange()">
+              <option value="no">No</option>
+              <option value="yes">Yes</option>
+            </select>
+          </div>
+          <div class="field field-with-mic" id="e-followup-note-field" style="display:none">
+            <label>Follow-up action</label>
+            <div class="input-mic-wrap">
+              <input type="text" id="e-followup-note">
+              <button type="button" class="mic-btn" onclick="toggleMic('e-followup-note', this)" title="Dictate">🎤</button>
+            </div>
+          </div>
+        </div>
+
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+      <button type="submit" form="edit-form" class="btn btn-primary" id="save-edit-btn">Save changes</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, onSnapshot, updateDoc }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+// ═══════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════
+let db = null;
+let unsubscribe = null;
+let allEntries = [];
+let filteredEntries = [];
+
+// ═══════════════════════════════════════════════════
+// CONFIG — persisted in localStorage per device
+// ═══════════════════════════════════════════════════
+function loadConfig() {
+  try { return JSON.parse(localStorage.getItem('care_diary_firebase') || 'null'); } catch { return null; }
+}
+function saveConfig(cfg) {
+  localStorage.setItem('care_diary_firebase', JSON.stringify(cfg));
+}
+function loadPrefs() {
+  try { return JSON.parse(localStorage.getItem('care_diary_prefs') || '{}'); } catch { return {}; }
+}
+function savePrefs(p) {
+  localStorage.setItem('care_diary_prefs', JSON.stringify(p));
+}
+
+// ═══════════════════════════════════════════════════
+// FIREBASE INIT
+// ═══════════════════════════════════════════════════
+function connectFirebase(cfg) {
+  try {
+    const app = initializeApp(cfg);
+    db = getFirestore(app);
+    setStatus('connected', 'Connected to Firebase');
+    document.getElementById('config-banner').style.display = 'none';
+    startListening();
+  } catch(e) {
+    setStatus('error', 'Connection failed: ' + e.message);
+    console.error(e);
+  }
+}
+
+function startListening() {
+  if (unsubscribe) unsubscribe();
+  const q = query(collection(db, 'entries'), orderBy('timestamp', 'desc'));
+  unsubscribe = onSnapshot(q, snapshot => {
+    allEntries = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    applyFilters();
+    updateFollowupBadge();
+    renderExportStats();
+  }, err => {
+    setStatus('error', 'Sync error: ' + err.message);
+  });
+}
+
+// ═══════════════════════════════════════════════════
+// STATUS
+// ═══════════════════════════════════════════════════
+function setStatus(state, msg) {
+  const dot = document.getElementById('status-dot');
+  const txt = document.getElementById('status-text');
+  dot.className = 'status-dot ' + state;
+  txt.textContent = msg;
+}
+
+// ═══════════════════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════════════════
+window.switchTab = function(name) {
+  ['log','diary','export','settings'].forEach(t => {
+    document.getElementById('tab-' + t).style.display = t === name ? 'block' : 'none';
+    document.querySelector(`.tab[data-tab="${t}"]`).classList.toggle('active', t === name);
+  });
+  if (name === 'export') renderExportStats();
+};
+
+// ═══════════════════════════════════════════════════
+// FORM LOGIC
+// ═══════════════════════════════════════════════════
+window.onCategoryChange = function() {
+  const cat = document.getElementById('f-category').value;
+  const isContact = cat.startsWith('contact-');
+  const isClinical = ['behaviour','incident','fall','medication','pain','communication'].includes(cat);
+
+  document.getElementById('contact-fields').className = isContact ? 'visible' : '';
+  const sf = document.getElementById('severity-field');
+  sf.className = isClinical ? 'visible' : '';
+};
+
+document.getElementById('f-followup').addEventListener('change', function() {
+  document.getElementById('followup-note-field').style.display = this.value === 'yes' ? 'flex' : 'none';
+});
+
+window.clearForm = function() {
+  // Reset selects to first option (blank)
+  ['f-who','f-category','f-severity','f-followup','f-org','f-method'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.selectedIndex = 0;
+  });
+  // Reset followup specifically to 'no' (index 0 is 'No')
+  document.getElementById('f-followup').selectedIndex = 0;
+  // Reset text fields
+  ['f-summary','f-notes','f-followup-note','f-contact-person','f-ref'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  // Hide conditional fields
+  onCategoryChange();
+  document.getElementById('followup-note-field').style.display = 'none';
+  // Reset date/time to now
+  setDateTimeNow();
+};
+
+function setDateTimeNow() {
+  const now = new Date();
+  document.getElementById('f-date').value = now.toISOString().slice(0,10);
+  document.getElementById('f-time').value = now.toTimeString().slice(0,5);
+}
+
+// Pre-fill name from prefs
+function applyPrefs() {
+  const p = loadPrefs();
+  if (p.patient) {
+    document.getElementById('header-title').textContent = p.patient + ' — Care Diary';
+    document.getElementById('pref-patient').value = p.patient;
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// SUBMIT
+// ═══════════════════════════════════════════════════
+window.submitEntry = async function(e) {
+  e.preventDefault();
+  if (!db) { showToast('Not connected to Firebase. Check Settings.'); return; }
+
+  const btn = document.getElementById('submit-btn');
+  btn.textContent = 'Saving…';
+  btn.disabled = true;
+
+  // Fallback: always reset button after 5 seconds no matter what
+  const resetBtn = () => { btn.textContent = 'Save Entry'; btn.disabled = false; };
+  const fallback = setTimeout(resetBtn, 5000);
+
+  // Snapshot form values immediately before any async work
+  const date = document.getElementById('f-date').value;
+  const time = document.getElementById('f-time').value;
+  const cat = document.getElementById('f-category').value;
+
+  const entry = {
+    timestamp: date + 'T' + time,
+    date, time,
+    who: document.getElementById('f-who').value.trim(),
+    category: cat,
+    severity: document.getElementById('f-severity').value || null,
+    summary: document.getElementById('f-summary').value.trim(),
+    notes: document.getElementById('f-notes').value.trim(),
+    followup: document.getElementById('f-followup').value === 'yes',
+    followupNote: document.getElementById('f-followup-note').value.trim() || null,
+    // Contact fields
+    org: document.getElementById('f-org').value || null,
+    contactPerson: document.getElementById('f-contact-person').value.trim() || null,
+    method: document.getElementById('f-method').value || null,
+    ref: document.getElementById('f-ref').value.trim() || null,
+    createdAt: new Date().toISOString()
+  };
+
+  try {
+    await addDoc(collection(db, 'entries'), entry);
+    showToast('Entry saved ✓');
+    clearForm();
+  } catch(err) {
+    showToast('Error saving: ' + err.message);
+    console.error(err);
+  } finally {
+    clearTimeout(fallback);
+    resetBtn();
+  }
+};
+
+// ═══════════════════════════════════════════════════
+// FILTERS & RENDER
+// ═══════════════════════════════════════════════════
+window.applyFilters = function() {
+  const from = document.getElementById('filter-from').value;
+  const to = document.getElementById('filter-to').value;
+  const cat = document.getElementById('filter-cat').value;
+  const fu = document.getElementById('filter-followup').value;
+
+  filteredEntries = allEntries.filter(e => {
+    if (from && e.date < from) return false;
+    if (to && e.date > to) return false;
+    if (cat && e.category !== cat) return false;
+    if (fu === 'followup' && !e.followup) return false;
+    return true;
+  });
+
+  renderEntries();
+  renderExportStats();
+};
+
+window.clearFilters = function() {
+  document.getElementById('filter-from').value = '';
+  document.getElementById('filter-to').value = '';
+  document.getElementById('filter-cat').value = '';
+  document.getElementById('filter-followup').value = 'all';
+  applyFilters();
+};
+
+function renderEntries() {
+  const list = document.getElementById('entries-list');
+  const count = document.getElementById('entry-count');
+
+  count.textContent = filteredEntries.length + ' entr' + (filteredEntries.length === 1 ? 'y' : 'ies');
+
+  if (filteredEntries.length === 0) {
+    list.innerHTML = `<div class="empty-state">
+      <div class="icon">📋</div>
+      <h3>No entries found</h3>
+      <p>Add your first entry using the Log Entry tab, or adjust your filters.</p>
+    </div>`;
+    return;
+  }
+
+  list.innerHTML = filteredEntries.map(e => renderEntryCard(e)).join('');
+}
+
+function catLabel(cat) {
+  const map = {
+    'behaviour': 'Behaviour / OCD',
+    'incident': 'Incident',
+    'fall': 'Fall / near-miss',
+    'medication': 'Medication',
+    'pain': 'Pain',
+    'communication': 'Communication',
+    'contact-authority': 'Contact — Authority',
+    'contact-medical': 'Contact — Medical',
+    'care-observation': 'Care observation',
+    'other': 'Other'
+  };
+  return map[cat] || cat;
+}
+
+function renderEntryCard(e) {
+  const dt = new Date(e.timestamp);
+  const dateStr = dt.toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short', year:'numeric' });
+  const timeStr = e.time || '';
+
+  const catClass = 'cat-' + (e.category || 'other');
+  const sevClass = e.severity ? 'sev-' + e.severity : '';
+
+  let extraDetails = '';
+  if (e.org) extraDetails += `<div class="detail-item"><div class="detail-label">Organisation</div><div class="detail-value">${esc(e.org)}</div></div>`;
+  if (e.contactPerson) extraDetails += `<div class="detail-item"><div class="detail-label">Contact person</div><div class="detail-value">${esc(e.contactPerson)}</div></div>`;
+  if (e.method) extraDetails += `<div class="detail-item"><div class="detail-label">Method</div><div class="detail-value">${esc(e.method)}</div></div>`;
+  if (e.ref) extraDetails += `<div class="detail-item"><div class="detail-label">Reference</div><div class="detail-value">${esc(e.ref)}</div></div>`;
+  if (e.severity) extraDetails += `<div class="detail-item"><div class="detail-label">Severity</div><div class="detail-value"><span class="category-pill ${sevClass}">${e.severity}</span></div></div>`;
+
+  const followupHtml = e.followup ? `<div class="followup-block">
+    <strong>⚠ Follow-up required</strong>${e.followupNote ? ': ' + esc(e.followupNote) : ''}
+  </div>` : '';
+
+  const editedBadge = e.editedAt ? `<span class="edited-badge">(edited)</span>` : '';
+
+  return `<div class="entry-card" id="entry-${e.id}">
+    <div class="entry-header" onclick="toggleEntry('${e.id}')">
+      <span class="category-pill ${catClass}">${catLabel(e.category)}</span>
+      <div class="entry-meta">
+        <div class="entry-summary">${esc(e.summary)}${editedBadge}</div>
+        <div class="entry-datetime">${dateStr} ${timeStr} · <span class="entry-who">${esc(e.who)}</span></div>
+      </div>
+      <span class="entry-chevron">⌄</span>
+    </div>
+    <div class="entry-body">
+      <div class="entry-detail-grid">
+        ${extraDetails}
+      </div>
+      ${e.notes ? `<div class="notes-block">${esc(e.notes)}</div>` : ''}
+      ${followupHtml}
+      <div class="entry-actions">
+        <button class="btn btn-secondary btn-sm" onclick="openEditModal('${e.id}')">Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteEntry('${e.id}', ${JSON.stringify(esc(e.summary))})">Delete</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+window.toggleEntry = function(id) {
+  const card = document.getElementById('entry-' + id);
+  card.classList.toggle('expanded');
+};
+
+// ═══════════════════════════════════════════════════
+// DELETE
+// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
+// DELETE
+// ═══════════════════════════════════════════════════
+window.deleteEntry = async function(id, summary) {
+  const label = summary ? `"${summary}"` : 'this entry';
+  if (!confirm(`Delete ${label}?\n\nThis cannot be undone.`)) return;
+  try {
+    await deleteDoc(doc(db, 'entries', id));
+    showToast('Entry deleted');
+  } catch(err) {
+    showToast('Error: ' + err.message);
+  }
+};
+
+// ═══════════════════════════════════════════════════
+// EDIT MODAL
+// ═══════════════════════════════════════════════════
+window.openEditModal = function(id) {
+  const entry = allEntries.find(e => e.id === id);
+  if (!entry) { showToast('Entry not found'); return; }
+
+  // Stop any active mic first
+  if (isListening) stopListening(true);
+
+  // Populate fields
+  document.getElementById('e-id').value = id;
+  document.getElementById('e-date').value = entry.date || '';
+  document.getElementById('e-time').value = entry.time || '';
+  document.getElementById('e-who').value = entry.who || '';
+  document.getElementById('e-category').value = entry.category || '';
+  document.getElementById('e-severity').value = entry.severity || '';
+  document.getElementById('e-summary').value = entry.summary || '';
+  document.getElementById('e-notes').value = entry.notes || '';
+  document.getElementById('e-org').value = entry.org || '';
+  document.getElementById('e-method').value = entry.method || '';
+  document.getElementById('e-contact-person').value = entry.contactPerson || '';
+  document.getElementById('e-ref').value = entry.ref || '';
+  document.getElementById('e-followup').value = entry.followup ? 'yes' : 'no';
+  document.getElementById('e-followup-note').value = entry.followupNote || '';
+
+  // Trigger conditional field visibility
+  onEditCategoryChange();
+  onEditFollowupChange();
+
+  // Open modal
+  document.getElementById('edit-modal-backdrop').classList.add('open');
+  document.body.style.overflow = 'hidden';
+};
+
+window.closeEditModal = function(event) {
+  // If click was on backdrop itself (not modal), close
+  if (event && event.target !== document.getElementById('edit-modal-backdrop')) return;
+  if (isListening) stopListening(true);
+  document.getElementById('edit-modal-backdrop').classList.remove('open');
+  document.body.style.overflow = '';
+};
+
+window.onEditCategoryChange = function() {
+  const cat = document.getElementById('e-category').value;
+  const isContact = cat.startsWith('contact-');
+  const isClinical = ['behaviour','incident','fall','medication','pain','communication'].includes(cat);
+  document.getElementById('e-contact-fields').style.display = isContact ? 'contents' : 'none';
+  document.getElementById('e-severity-field').style.display = isClinical ? 'flex' : 'none';
+};
+
+window.onEditFollowupChange = function() {
+  const val = document.getElementById('e-followup').value;
+  document.getElementById('e-followup-note-field').style.display = val === 'yes' ? 'flex' : 'none';
+};
+
+window.saveEdit = async function(event) {
+  event.preventDefault();
+  if (!db) { showToast('Not connected to Firebase'); return; }
+
+  const id = document.getElementById('e-id').value;
+  if (!id) return;
+
+  const btn = document.getElementById('save-edit-btn');
+  btn.textContent = 'Saving…';
+  btn.disabled = true;
+
+  // Stop mic if still listening
+  if (isListening) stopListening(true);
+
+  const cat = document.getElementById('e-category').value;
+  const date = document.getElementById('e-date').value;
+  const time = document.getElementById('e-time').value;
+
+  const updates = {
+    timestamp: date + 'T' + time,
+    date, time,
+    who: document.getElementById('e-who').value.trim(),
+    category: cat,
+    severity: document.getElementById('e-severity').value || null,
+    summary: document.getElementById('e-summary').value.trim(),
+    notes: document.getElementById('e-notes').value.trim(),
+    followup: document.getElementById('e-followup').value === 'yes',
+    followupNote: document.getElementById('e-followup-note').value.trim() || null,
+    org: document.getElementById('e-org').value || null,
+    contactPerson: document.getElementById('e-contact-person').value.trim() || null,
+    method: document.getElementById('e-method').value || null,
+    ref: document.getElementById('e-ref').value.trim() || null,
+    editedAt: new Date().toISOString()
+  };
+
+  try {
+    await updateDoc(doc(db, 'entries', id), updates);
+    showToast('Entry updated ✓');
+    document.getElementById('edit-modal-backdrop').classList.remove('open');
+    document.body.style.overflow = '';
+  } catch(err) {
+    showToast('Error saving: ' + err.message);
+    console.error(err);
+  } finally {
+    btn.textContent = 'Save changes';
+    btn.disabled = false;
+  }
+};
+
+// Close modal on Escape key
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && document.getElementById('edit-modal-backdrop').classList.contains('open')) {
+    if (isListening) stopListening(true);
+    document.getElementById('edit-modal-backdrop').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+});
+
+// ═══════════════════════════════════════════════════
+// FOLLOW-UP BADGE
+// ═══════════════════════════════════════════════════
+function updateFollowupBadge() {
+  const n = allEntries.filter(e => e.followup).length;
+  const badge = document.getElementById('followup-count');
+  if (n > 0) {
+    badge.textContent = n;
+    badge.style.display = 'inline';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// EXPORT STATS
+// ═══════════════════════════════════════════════════
+function renderExportStats() {
+  const src = filteredEntries.length ? filteredEntries : allEntries;
+  const grid = document.getElementById('export-stats');
+  if (!src.length) {
+    grid.innerHTML = '<div class="loading">No entries to summarise</div>';
+    return;
+  }
+
+  const cats = {};
+  src.forEach(e => { cats[e.category] = (cats[e.category] || 0) + 1; });
+  const followups = src.filter(e => e.followup).length;
+
+  const cards = Object.entries(cats)
+    .sort((a,b) => b[1]-a[1])
+    .map(([c,n]) => `<div class="stat-card">
+      <div class="stat-number">${n}</div>
+      <div class="stat-label">${catLabel(c)}</div>
+    </div>`).join('');
+
+  grid.innerHTML = `
+    <div class="stat-card">
+      <div class="stat-number">${src.length}</div>
+      <div class="stat-label">Total entries</div>
+    </div>
+    <div class="stat-card" style="border-color:var(--amber-border);background:var(--amber-light)">
+      <div class="stat-number" style="color:var(--amber)">${followups}</div>
+      <div class="stat-label" style="color:var(--amber)">Follow-ups open</div>
+    </div>
+    ${cards}`;
+}
+
+// ═══════════════════════════════════════════════════
+// PRINT
+// ═══════════════════════════════════════════════════
+window.printFiltered = function() {
+  const patient = document.getElementById('export-patient').value
+    || document.getElementById('pref-patient').value
+    || 'Care Diary';
+  const period = document.getElementById('export-period').value || '';
+  const preparer = document.getElementById('export-preparer').value || '';
+
+  document.getElementById('print-title').textContent = patient + ' — Care Diary';
+  document.getElementById('print-subtitle').textContent =
+    [period ? 'Period: ' + period : '', preparer ? 'Prepared by: ' + preparer : '']
+    .filter(Boolean).join(' · ');
+
+  // Expand all entries for print
+  document.querySelectorAll('.entry-card').forEach(c => c.classList.add('expanded'));
+  window.print();
+  // Collapse again after
+  setTimeout(() => {
+    document.querySelectorAll('.entry-card').forEach(c => c.classList.remove('expanded'));
+  }, 1000);
+};
+
+// ═══════════════════════════════════════════════════
+// CSV EXPORT
+// ═══════════════════════════════════════════════════
+window.exportCSV = function() {
+  const src = filteredEntries.length ? filteredEntries : allEntries;
+  if (!src.length) { showToast('No entries to export'); return; }
+
+  const headers = ['Date','Time','Logged by','Category','Severity','Summary',
+    'Notes','Organisation','Contact person','Method','Reference','Follow-up required','Follow-up action'];
+
+  const rows = src.map(e => [
+    e.date, e.time, e.who, catLabel(e.category), e.severity || '',
+    e.summary, e.notes || '',
+    e.org || '', e.contactPerson || '', e.method || '', e.ref || '',
+    e.followup ? 'Yes' : 'No', e.followupNote || ''
+  ].map(v => '"' + String(v).replace(/"/g,'""') + '"'));
+
+  const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'care-diary-' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('CSV downloaded ✓');
+};
+
+// ═══════════════════════════════════════════════════
+// SETTINGS SAVE
+// ═══════════════════════════════════════════════════
+window.saveFirebaseConfig = function() {
+  const cfg = {
+    apiKey: document.getElementById('cfg-apiKey').value.trim(),
+    authDomain: document.getElementById('cfg-authDomain').value.trim(),
+    projectId: document.getElementById('cfg-projectId').value.trim(),
+    appId: document.getElementById('cfg-appId').value.trim(),
+  };
+  if (!cfg.apiKey || !cfg.projectId) { showToast('Please fill in all Firebase fields'); return; }
+  saveConfig(cfg);
+  connectFirebase(cfg);
+  showToast('Connecting…');
+};
+
+window.savePreferences = function() {
+  const p = {
+    patient: document.getElementById('pref-patient').value.trim()
+  };
+  savePrefs(p);
+  applyPrefs();
+  showToast('Preferences saved ✓');
+};
+
+// ═══════════════════════════════════════════════════
+// SETTINGS LOAD
+// ═══════════════════════════════════════════════════
+function loadSavedConfig() {
+  const cfg = loadConfig();
+  if (cfg) {
+    document.getElementById('cfg-apiKey').value = cfg.apiKey || '';
+    document.getElementById('cfg-authDomain').value = cfg.authDomain || '';
+    document.getElementById('cfg-projectId').value = cfg.projectId || '';
+    document.getElementById('cfg-appId').value = cfg.appId || '';
+    connectFirebase(cfg);
+  } else {
+    setStatus('', 'Not configured — see Settings tab');
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// UTILITY
+// ═══════════════════════════════════════════════════
+function esc(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
+
+let toastTimer;
+window.showToast = function(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+};
+
+// ═══════════════════════════════════════════════════
+// SPEECH RECOGNITION
+// ═══════════════════════════════════════════════════
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition = null;
+let activeMicBtn = null;
+let activeFieldId = null;
+let isListening = false;
+
+if (!SpeechRecognition) {
+  // Show warning, hide all mic buttons
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('no-speech-msg').style.display = 'block';
+    document.querySelectorAll('.mic-btn').forEach(b => b.style.display = 'none');
+  });
+}
+
+function buildRecognition() {
+  const r = new SpeechRecognition();
+  r.continuous = true;
+  r.interimResults = true;
+  r.lang = 'en-GB';
+  r.maxAlternatives = 1;
+
+  let finalTranscript = '';
+  let fieldStartValue = '';
+
+  r.onstart = () => {
+    isListening = true;
+    finalTranscript = '';
+    // Snapshot the current field value so we append, not replace
+    fieldStartValue = document.getElementById(activeFieldId)?.value || '';
+    document.getElementById('mic-status').classList.add('visible');
+    document.getElementById('mic-status-text').textContent =
+      'Listening — tap 🎤 again to stop';
+    if (activeMicBtn) activeMicBtn.classList.add('recording');
+  };
+
+  r.onresult = (event) => {
+    let interim = '';
+    finalTranscript = '';
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const t = event.results[i][0].transcript;
+      if (event.results[i].isFinal) {
+        finalTranscript += t + ' ';
+      } else {
+        interim += t;
+      }
+    }
+    // Show interim in field while speaking
+    const el = document.getElementById(activeFieldId);
+    if (el) {
+      const separator = fieldStartValue && !fieldStartValue.endsWith(' ') ? ' ' : '';
+      el.value = fieldStartValue + separator + finalTranscript + interim;
+    }
+  };
+
+  r.onfinalresult = () => {};
+
+  r.onerror = (event) => {
+    if (event.error === 'no-speech') {
+      showToast('No speech detected — try again');
+    } else if (event.error === 'not-allowed') {
+      showToast('Microphone permission denied — check browser settings');
+    } else if (event.error !== 'aborted') {
+      showToast('Mic error: ' + event.error);
+    }
+    stopListening(false);
+  };
+
+  r.onend = () => {
+    if (isListening) {
+      // Continuous mode ended unexpectedly (iOS does this) — commit what we have
+      commitFinal(finalTranscript);
+      stopListening(false);
+    }
+  };
+
+  function commitFinal(transcript) {
+    const el = document.getElementById(activeFieldId);
+    if (el && transcript.trim()) {
+      const current = fieldStartValue;
+      const separator = current && !current.endsWith(' ') && !current.endsWith('\n') ? ' ' : '';
+      el.value = current + separator + transcript.trim();
+      // Move cursor to end
+      el.setSelectionRange(el.value.length, el.value.length);
+    }
+  }
+
+  r._commitFinal = commitFinal;
+  r._getFinal = () => finalTranscript;
+  r._getFieldStart = () => fieldStartValue;
+
+  return r;
+}
+
+window.toggleMic = function(fieldId, btn) {
+  if (!SpeechRecognition) {
+    showToast('Voice input not supported in this browser');
+    return;
+  }
+
+  // If already listening on THIS field — stop
+  if (isListening && activeFieldId === fieldId) {
+    stopListening(true);
+    return;
+  }
+
+  // If listening on a DIFFERENT field — stop that one first
+  if (isListening) {
+    stopListening(true);
+  }
+
+  // Start new
+  activeFieldId = fieldId;
+  activeMicBtn = btn;
+
+  recognition = buildRecognition();
+  try {
+    recognition.start();
+  } catch(e) {
+    showToast('Could not start microphone: ' + e.message);
+    stopListening(false);
+  }
+};
+
+function stopListening(commit) {
+  isListening = false;
+  document.getElementById('mic-status').classList.remove('visible');
+  if (activeMicBtn) activeMicBtn.classList.remove('recording');
+
+  if (recognition) {
+    if (commit && recognition._getFinal) {
+      recognition._commitFinal(recognition._getFinal());
+    }
+    try { recognition.stop(); } catch(e) {}
+    recognition = null;
+  }
+
+  activeMicBtn = null;
+  // Don't clear activeFieldId yet so onend can still commit
+  setTimeout(() => { activeFieldId = null; }, 200);
+}
+
+// Stop mic if user switches tab or navigates away
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => { if (isListening) stopListening(true); });
+});
+window.addEventListener('beforeunload', () => { if (isListening) stopListening(false); });
+
+// ═══════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════
+setDateTimeNow();
+applyPrefs();
+loadSavedConfig();
+// Init empty diary
+applyFilters();
+
+</script>
+</body>
+</html>
