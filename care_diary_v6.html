@@ -415,6 +415,7 @@
   .cat-contact-authority { background: var(--accent-light); color: #1e3a8a; border: 1px solid var(--accent-border); }
   .cat-contact-medical { background: var(--green-light); color: var(--green); border: 1px solid var(--green-border); }
   .cat-care-observation { background: #f8fafc; color: #334155; border: 1px solid #cbd5e1; }
+  .cat-hospital-observation { background: #eff6ff; color: #1e40af; border: 1px solid #93c5fd; }
   .cat-other { background: var(--surface2); color: var(--text-muted); border: 1px solid var(--border); }
 
   /* ── Severity badges ── */
@@ -813,6 +814,7 @@
               <option value="contact-authority">Contact — Authority (ICB / council / legal)</option>
               <option value="contact-medical">Contact — Medical (GP / hospital / specialist)</option>
               <option value="care-observation">Care home observation</option>
+              <option value="hospital-observation">Hospital observation</option>
               <option value="other">Other</option>
             </select>
           </div>
@@ -945,6 +947,7 @@
           <option value="contact-authority">Contact — Authority</option>
           <option value="contact-medical">Contact — Medical</option>
           <option value="care-observation">Care observation</option>
+          <option value="hospital-observation">Hospital observation</option>
           <option value="other">Other</option>
         </select>
       </div>
@@ -1113,6 +1116,7 @@
               <option value="contact-authority">Contact — Authority (ICB / council / legal)</option>
               <option value="contact-medical">Contact — Medical (GP / hospital / specialist)</option>
               <option value="care-observation">Care home observation</option>
+              <option value="hospital-observation">Hospital observation</option>
               <option value="other">Other</option>
             </select>
           </div>
@@ -1464,6 +1468,7 @@ function catLabel(cat) {
     'contact-authority': 'Contact — Authority',
     'contact-medical': 'Contact — Medical',
     'care-observation': 'Care observation',
+    'hospital-observation': 'Hospital observation',
     'other': 'Other'
   };
   return map[cat] || cat;
