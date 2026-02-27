@@ -521,33 +521,35 @@
   }
   #toast.show { transform: translateX(-50%) translateY(0); }
 
-  /* ── Category checklist ── */
+  /* ── Category chips ── */
   .cat-checklist {
     display: flex;
-    flex-direction: column;
-    gap: 6px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 10px 12px;
-  }
-  .cat-check {
-    display: flex;
-    align-items: center;
+    flex-wrap: wrap;
     gap: 8px;
-    font-size: 14px;
-    color: var(--text);
-    cursor: pointer;
-    padding: 2px 0;
+    padding: 4px 0;
   }
-  .cat-check input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
-    flex-shrink: 0;
-    accent-color: var(--accent);
+  .cat-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 14px;
+    border-radius: 20px;
+    border: 2px solid var(--border);
+    background: var(--surface2);
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 500;
     cursor: pointer;
+    user-select: none;
+    transition: all 0.15s;
+    -webkit-tap-highlight-color: transparent;
   }
-  .cat-check:hover { color: var(--accent); }
+  .cat-chip:hover { border-color: var(--accent); color: var(--accent); }
+  .cat-chip.selected {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  .cat-chip input[type="checkbox"] { display: none; }
 
   /* ── Mic button ── */
   .field-with-mic {
@@ -845,17 +847,17 @@
           <div class="field">
             <label>Category <span style="font-weight:400;text-transform:none;letter-spacing:0">(select all that apply)</span></label>
             <div class="cat-checklist" id="f-category-list">
-              <label class="cat-check"><input type="checkbox" value="behaviour" onchange="onCategoryChange()"> Behaviour / OCD episode</label>
-              <label class="cat-check"><input type="checkbox" value="incident" onchange="onCategoryChange()"> Incident / accident</label>
-              <label class="cat-check"><input type="checkbox" value="fall" onchange="onCategoryChange()"> Fall or near-miss</label>
-              <label class="cat-check"><input type="checkbox" value="medication" onchange="onCategoryChange()"> Medication change / reaction</label>
-              <label class="cat-check"><input type="checkbox" value="pain" onchange="onCategoryChange()"> Pain / comfort</label>
-              <label class="cat-check"><input type="checkbox" value="communication" onchange="onCategoryChange()"> Communication difficulty</label>
-              <label class="cat-check"><input type="checkbox" value="contact-authority" onchange="onCategoryChange()"> Contact — Authority (ICB / council / legal)</label>
-              <label class="cat-check"><input type="checkbox" value="contact-medical" onchange="onCategoryChange()"> Contact — Medical (GP / hospital / specialist)</label>
-              <label class="cat-check"><input type="checkbox" value="care-observation" onchange="onCategoryChange()"> Care home observation</label>
-              <label class="cat-check"><input type="checkbox" value="hospital-observation" onchange="onCategoryChange()"> Hospital observation</label>
-              <label class="cat-check"><input type="checkbox" value="other" onchange="onCategoryChange()"> Other</label>
+              <label class="cat-chip"><input type="checkbox" value="behaviour" onchange="onCategoryChange()"> Behaviour / OCD episode</label>
+              <label class="cat-chip"><input type="checkbox" value="incident" onchange="onCategoryChange()"> Incident / accident</label>
+              <label class="cat-chip"><input type="checkbox" value="fall" onchange="onCategoryChange()"> Fall or near-miss</label>
+              <label class="cat-chip"><input type="checkbox" value="medication" onchange="onCategoryChange()"> Medication change / reaction</label>
+              <label class="cat-chip"><input type="checkbox" value="pain" onchange="onCategoryChange()"> Pain / comfort</label>
+              <label class="cat-chip"><input type="checkbox" value="communication" onchange="onCategoryChange()"> Communication difficulty</label>
+              <label class="cat-chip"><input type="checkbox" value="contact-authority" onchange="onCategoryChange()"> Contact — Authority</label>
+              <label class="cat-chip"><input type="checkbox" value="contact-medical" onchange="onCategoryChange()"> Contact — Medical</label>
+              <label class="cat-chip"><input type="checkbox" value="care-observation" onchange="onCategoryChange()"> Care home observation</label>
+              <label class="cat-chip"><input type="checkbox" value="hospital-observation" onchange="onCategoryChange()"> Hospital observation</label>
+              <label class="cat-chip"><input type="checkbox" value="other" onchange="onCategoryChange()"> Other</label>
             </div>
           </div>
           <div class="field" id="severity-field">
@@ -1145,18 +1147,18 @@
         <div class="form-row">
           <div class="field">
             <label>Category <span style="font-weight:400;text-transform:none;letter-spacing:0">(select all that apply)</span></label>
-            <div class="cat-checklist" id="e-category-list">
-              <label class="cat-check"><input type="checkbox" value="behaviour" onchange="onEditCategoryChange()"> Behaviour / OCD episode</label>
-              <label class="cat-check"><input type="checkbox" value="incident" onchange="onEditCategoryChange()"> Incident / accident</label>
-              <label class="cat-check"><input type="checkbox" value="fall" onchange="onEditCategoryChange()"> Fall or near-miss</label>
-              <label class="cat-check"><input type="checkbox" value="medication" onchange="onEditCategoryChange()"> Medication change / reaction</label>
-              <label class="cat-check"><input type="checkbox" value="pain" onchange="onEditCategoryChange()"> Pain / comfort</label>
-              <label class="cat-check"><input type="checkbox" value="communication" onchange="onEditCategoryChange()"> Communication difficulty</label>
-              <label class="cat-check"><input type="checkbox" value="contact-authority" onchange="onEditCategoryChange()"> Contact — Authority (ICB / council / legal)</label>
-              <label class="cat-check"><input type="checkbox" value="contact-medical" onchange="onEditCategoryChange()"> Contact — Medical (GP / hospital / specialist)</label>
-              <label class="cat-check"><input type="checkbox" value="care-observation" onchange="onEditCategoryChange()"> Care home observation</label>
-              <label class="cat-check"><input type="checkbox" value="hospital-observation" onchange="onEditCategoryChange()"> Hospital observation</label>
-              <label class="cat-check"><input type="checkbox" value="other" onchange="onEditCategoryChange()"> Other</label>
+            <div class="cat-chiplist" id="e-category-list">
+              <label class="cat-chip"><input type="checkbox" value="behaviour" onchange="onEditCategoryChange()"> Behaviour / OCD episode</label>
+              <label class="cat-chip"><input type="checkbox" value="incident" onchange="onEditCategoryChange()"> Incident / accident</label>
+              <label class="cat-chip"><input type="checkbox" value="fall" onchange="onEditCategoryChange()"> Fall or near-miss</label>
+              <label class="cat-chip"><input type="checkbox" value="medication" onchange="onEditCategoryChange()"> Medication change / reaction</label>
+              <label class="cat-chip"><input type="checkbox" value="pain" onchange="onEditCategoryChange()"> Pain / comfort</label>
+              <label class="cat-chip"><input type="checkbox" value="communication" onchange="onEditCategoryChange()"> Communication difficulty</label>
+              <label class="cat-chip"><input type="checkbox" value="contact-authority" onchange="onEditCategoryChange()"> Contact — Authority (ICB / council / legal)</label>
+              <label class="cat-chip"><input type="checkbox" value="contact-medical" onchange="onEditCategoryChange()"> Contact — Medical (GP / hospital / specialist)</label>
+              <label class="cat-chip"><input type="checkbox" value="care-observation" onchange="onEditCategoryChange()"> Care home observation</label>
+              <label class="cat-chip"><input type="checkbox" value="hospital-observation" onchange="onEditCategoryChange()"> Hospital observation</label>
+              <label class="cat-chip"><input type="checkbox" value="other" onchange="onEditCategoryChange()"> Other</label>
             </div>
           </div>
           <div class="field" id="e-severity-field" style="display:none">
@@ -1356,13 +1358,26 @@ function getCheckedCategories(listId) {
 }
 function setCheckedCategories(listId, categories) {
   const cats = Array.isArray(categories) ? categories : (categories ? [categories] : []);
-  document.querySelectorAll(`#${listId} input[type="checkbox"]`).forEach(cb => {
-    cb.checked = cats.includes(cb.value);
+  document.querySelectorAll(`#${listId} .cat-chip`).forEach(chip => {
+    const cb = chip.querySelector('input[type="checkbox"]');
+    const checked = cats.includes(cb.value);
+    cb.checked = checked;
+    chip.classList.toggle('selected', checked);
   });
 }
 function clearCheckedCategories(listId) {
-  document.querySelectorAll(`#${listId} input[type="checkbox"]`).forEach(cb => cb.checked = false);
+  document.querySelectorAll(`#${listId} .cat-chip`).forEach(chip => {
+    chip.querySelector('input[type="checkbox"]').checked = false;
+    chip.classList.remove('selected');
+  });
 }
+
+// Toggle selected class when chip is clicked
+document.addEventListener('change', function(e) {
+  if (e.target.type === 'checkbox' && e.target.closest('.cat-chip')) {
+    e.target.closest('.cat-chip').classList.toggle('selected', e.target.checked);
+  }
+});
 const CLINICAL_CATS = ['behaviour','incident','fall','medication','pain','communication'];
 const CONTACT_CATS = ['contact-authority','contact-medical'];
 
