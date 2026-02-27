@@ -69,15 +69,16 @@ function setup() {
   btn.textContent = 'Setting up…';
 
   try {
-    const prefs = {
+    const config = {
       apiKey: "AIzaSyApZsJv9zwUmu2mbjdHpICBWEg0iq5M-2Q",
       authDomain: "moms-care-log.firebaseapp.com",
       projectId: "moms-care-log",
-      appId: "1:480794700834:web:bca77ac6e158d153866e7b",
-      patient: "Mary Blest"
+      appId: "1:480794700834:web:bca77ac6e158d153866e7b"
     };
+    const prefs = { patient: "Mary Blest" };
 
-    localStorage.setItem('careDiaryPrefs', JSON.stringify(prefs));
+    localStorage.setItem('care_diary_firebase', JSON.stringify(config));
+    localStorage.setItem('care_diary_prefs', JSON.stringify(prefs));
 
     status.className = 'status success';
     status.textContent = '✓ Setup complete! Taking you to the diary…';
