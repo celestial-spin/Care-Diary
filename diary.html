@@ -228,6 +228,39 @@
     white-space: nowrap;
   }
 
+  .checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 8px 0;
+  }
+  .checkbox-group label {
+    font-size: 12px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    color: var(--text-muted);
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .checkbox-group label:active {
+    transform: scale(0.96);
+  }
+  .checkbox-group input[type="checkbox"] {
+    display: none;
+  }
+  .checkbox-group input[type="checkbox"]:checked + span,
+  .checkbox-group label:has(input:checked) {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+  }
+
   /* Contact-specific fields */
   #contact-fields { display: none; }
   #contact-fields.visible { display: contents; }
@@ -811,22 +844,21 @@
         </div>
 
         <div class="form-row cols-2">
-          <div class="field">
-            <label>Category</label>
-            <select id="f-category" onchange="onCategoryChange()" required>
-              <option value="">— select —</option>
-              <option value="behaviour">Behaviour / OCD episode</option>
-              <option value="incident">Incident / accident</option>
-              <option value="fall">Fall or near-miss</option>
-              <option value="medication">Medication change / reaction</option>
-              <option value="pain">Pain / comfort</option>
-              <option value="communication">Communication difficulty</option>
-              <option value="contact-authority">Contact — Authority (ICB / council / legal)</option>
-              <option value="contact-medical">Contact — Medical (GP / hospital / specialist)</option>
-              <option value="care-observation">Care home observation</option>
-              <option value="hospital-observation">Hospital observation</option>
-              <option value="other">Other</option>
-            </select>
+          <div class="field" style="grid-column: 1 / -1;">
+            <label>Category (select all that apply)</label>
+            <div id="f-category-group" class="checkbox-group" onchange="onCategoryChange()">
+              <label><input type="checkbox" name="f-cat" value="behaviour"> Behaviour / OCD episode</label>
+              <label><input type="checkbox" name="f-cat" value="incident"> Incident / accident</label>
+              <label><input type="checkbox" name="f-cat" value="fall"> Fall or near-miss</label>
+              <label><input type="checkbox" name="f-cat" value="medication"> Medication change / reaction</label>
+              <label><input type="checkbox" name="f-cat" value="pain"> Pain / comfort</label>
+              <label><input type="checkbox" name="f-cat" value="communication"> Communication difficulty</label>
+              <label><input type="checkbox" name="f-cat" value="contact-authority"> Contact — Authority</label>
+              <label><input type="checkbox" name="f-cat" value="contact-medical"> Contact — Medical</label>
+              <label><input type="checkbox" name="f-cat" value="care-observation"> Care home observation</label>
+              <label><input type="checkbox" name="f-cat" value="hospital-observation"> Hospital observation</label>
+              <label><input type="checkbox" name="f-cat" value="other"> Other</label>
+            </div>
           </div>
           <div class="field" id="severity-field">
             <label>Severity</label>
@@ -1112,23 +1144,22 @@
           </div>
         </div>
 
-        <div class="form-row cols-2">
-          <div class="field">
-            <label>Category</label>
-            <select id="e-category" onchange="onEditCategoryChange()" required>
-              <option value="">— select —</option>
-              <option value="behaviour">Behaviour / OCD episode</option>
-              <option value="incident">Incident / accident</option>
-              <option value="fall">Fall or near-miss</option>
-              <option value="medication">Medication change / reaction</option>
-              <option value="pain">Pain / comfort</option>
-              <option value="communication">Communication difficulty</option>
-              <option value="contact-authority">Contact — Authority (ICB / council / legal)</option>
-              <option value="contact-medical">Contact — Medical (GP / hospital / specialist)</option>
-              <option value="care-observation">Care home observation</option>
-              <option value="hospital-observation">Hospital observation</option>
-              <option value="other">Other</option>
-            </select>
+        <div class="form-row">
+          <div class="field" style="grid-column: 1 / -1;">
+            <label>Category (select all that apply)</label>
+            <div id="e-category-group" class="checkbox-group" onchange="onEditCategoryChange()">
+              <label><input type="checkbox" name="e-cat" value="behaviour"> Behaviour / OCD episode</label>
+              <label><input type="checkbox" name="e-cat" value="incident"> Incident / accident</label>
+              <label><input type="checkbox" name="e-cat" value="fall"> Fall or near-miss</label>
+              <label><input type="checkbox" name="e-cat" value="medication"> Medication change / reaction</label>
+              <label><input type="checkbox" name="e-cat" value="pain"> Pain / comfort</label>
+              <label><input type="checkbox" name="e-cat" value="communication"> Communication difficulty</label>
+              <label><input type="checkbox" name="e-cat" value="contact-authority"> Contact — Authority</label>
+              <label><input type="checkbox" name="e-cat" value="contact-medical"> Contact — Medical</label>
+              <label><input type="checkbox" name="e-cat" value="care-observation"> Care home observation</label>
+              <label><input type="checkbox" name="e-cat" value="hospital-observation"> Hospital observation</label>
+              <label><input type="checkbox" name="e-cat" value="other"> Other</label>
+            </div>
           </div>
           <div class="field" id="e-severity-field" style="display:none">
             <label>Severity</label>
@@ -1320,10 +1351,14 @@ window.switchTab = function(name) {
 // ═══════════════════════════════════════════════════
 // FORM LOGIC
 // ═══════════════════════════════════════════════════
+window.getSelectedCats = function() {
+  return Array.from(document.querySelectorAll('input[name="f-cat"]:checked')).map(cb => cb.value);
+};
+
 window.onCategoryChange = function() {
-  const cat = document.getElementById('f-category').value;
-  const isContact = cat.startsWith('contact-');
-  const isClinical = ['behaviour','incident','fall','medication','pain','communication'].includes(cat);
+  const cats = getSelectedCats();
+  const isContact = cats.some(c => c.startsWith('contact-'));
+  const isClinical = cats.some(c => ['behaviour','incident','fall','medication','pain','communication'].includes(c));
 
   document.getElementById('contact-fields').className = isContact ? 'visible' : '';
   const sf = document.getElementById('severity-field');
@@ -1336,10 +1371,12 @@ document.getElementById('f-followup').addEventListener('change', function() {
 
 window.clearForm = function() {
   // Reset selects to first option (blank)
-  ['f-who','f-category','f-severity','f-followup','f-org','f-method'].forEach(id => {
+  ['f-who','f-severity','f-followup','f-org','f-method'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.selectedIndex = 0;
   });
+  // Uncheck all category checkboxes
+  document.querySelectorAll('input[name="f-cat"]').forEach(cb => cb.checked = false);
   // Reset followup specifically to 'no' (index 0 is 'No')
   document.getElementById('f-followup').selectedIndex = 0;
   // Reset text fields
@@ -1387,13 +1424,14 @@ window.submitEntry = async function(e) {
   // Snapshot form values immediately before any async work
   const date = document.getElementById('f-date').value;
   const time = document.getElementById('f-time').value;
-  const cat = document.getElementById('f-category').value;
+  const cats = getSelectedCats();
+  if (!cats.length) { showToast('Please select at least one category.'); resetBtn(); clearTimeout(fallback); return; }
 
   const entry = {
     timestamp: date + 'T' + time,
     date, time,
     who: document.getElementById('f-who').value.trim(),
-    category: cat,
+    category: cats.length === 1 ? cats[0] : cats,
     severity: document.getElementById('f-severity').value || null,
     summary: document.getElementById('f-summary').value.trim(),
     notes: document.getElementById('f-notes').value.trim(),
@@ -1432,7 +1470,10 @@ window.applyFilters = function() {
   filteredEntries = allEntries.filter(e => {
     if (from && e.date < from) return false;
     if (to && e.date > to) return false;
-    if (cat && e.category !== cat) return false;
+    if (cat) {
+      const eCats = Array.isArray(e.category) ? e.category : [e.category];
+      if (!eCats.includes(cat)) return false;
+    }
     if (fu === 'followup' && !e.followup) return false;
     return true;
   });
@@ -1489,7 +1530,12 @@ function renderEntryCard(e) {
   const dateStr = dt.toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short', year:'numeric' });
   const timeStr = e.time || '';
 
-  const catClass = 'cat-' + (e.category || 'other');
+  // Support both single category (string) and multiple categories (array) from v5
+  const cats = Array.isArray(e.category) ? e.category : (e.category ? [e.category] : ['other']);
+  const catPillsHtml = cats.map(c => {
+    const cls = 'cat-' + (c || 'other');
+    return `<span class="category-pill ${cls}">${catLabel(c)}</span>`;
+  }).join('');
   const sevClass = e.severity ? 'sev-' + e.severity : '';
 
   let extraDetails = '';
@@ -1508,7 +1554,7 @@ function renderEntryCard(e) {
   return `<div class="entry-card" id="entry-${e.id}">
     <div class="entry-header" onclick="toggleEntry('${e.id}')">
       <div class="entry-pills">
-        <span class="category-pill ${catClass}">${catLabel(e.category)}</span>
+        ${catPillsHtml}
       </div>
       <span class="entry-chevron">⌄</span>
       <div class="entry-meta">
@@ -1577,7 +1623,13 @@ window.openEditModal = function(id) {
   document.getElementById('e-date').value = entry.date || '';
   document.getElementById('e-time').value = entry.time || '';
   document.getElementById('e-who').value = entry.who || '';
-  document.getElementById('e-category').value = entry.category || '';
+  // Set category checkboxes
+  document.querySelectorAll('input[name="e-cat"]').forEach(cb => cb.checked = false);
+  const eCats = Array.isArray(entry.category) ? entry.category : [entry.category];
+  eCats.forEach(c => {
+    const cb = document.querySelector(`input[name="e-cat"][value="${c}"]`);
+    if (cb) cb.checked = true;
+  });
   document.getElementById('e-severity').value = entry.severity || '';
   document.getElementById('e-summary').value = entry.summary || '';
   document.getElementById('e-notes').value = entry.notes || '';
@@ -1606,9 +1658,9 @@ window.closeEditModal = function(event) {
 };
 
 window.onEditCategoryChange = function() {
-  const cat = document.getElementById('e-category').value;
-  const isContact = cat.startsWith('contact-');
-  const isClinical = ['behaviour','incident','fall','medication','pain','communication'].includes(cat);
+  const cats = Array.from(document.querySelectorAll('input[name="e-cat"]:checked')).map(cb => cb.value);
+  const isContact = cats.some(c => c.startsWith('contact-'));
+  const isClinical = cats.some(c => ['behaviour','incident','fall','medication','pain','communication'].includes(c));
   document.getElementById('e-contact-fields').style.display = isContact ? 'contents' : 'none';
   document.getElementById('e-severity-field').style.display = isClinical ? 'flex' : 'none';
 };
@@ -1632,7 +1684,7 @@ window.saveEdit = async function(event) {
   // Stop mic if still listening
   if (isListening) stopListening(true);
 
-  const cat = document.getElementById('e-category').value;
+  const cats = Array.from(document.querySelectorAll('input[name="e-cat"]:checked')).map(cb => cb.value);
   const date = document.getElementById('e-date').value;
   const time = document.getElementById('e-time').value;
 
@@ -1640,7 +1692,7 @@ window.saveEdit = async function(event) {
     timestamp: date + 'T' + time,
     date, time,
     who: document.getElementById('e-who').value.trim(),
-    category: cat,
+    category: cats.length === 1 ? cats[0] : cats,
     severity: document.getElementById('e-severity').value || null,
     summary: document.getElementById('e-summary').value.trim(),
     notes: document.getElementById('e-notes').value.trim(),
@@ -1702,7 +1754,10 @@ function renderExportStats() {
   }
 
   const cats = {};
-  src.forEach(e => { cats[e.category] = (cats[e.category] || 0) + 1; });
+  src.forEach(e => {
+    const eCats = Array.isArray(e.category) ? e.category : [e.category];
+    eCats.forEach(c => { cats[c] = (cats[c] || 0) + 1; });
+  });
   const followups = src.filter(e => e.followup).length;
 
   const cards = Object.entries(cats)
@@ -1759,7 +1814,7 @@ window.exportCSV = function() {
     'Notes','Organisation','Contact person','Method','Reference','Follow-up required','Follow-up action'];
 
   const rows = src.map(e => [
-    e.date, e.time, e.who, catLabel(e.category), e.severity || '',
+    e.date, e.time, e.who, (Array.isArray(e.category) ? e.category : [e.category]).map(catLabel).join(', '), e.severity || '',
     e.summary, e.notes || '',
     e.org || '', e.contactPerson || '', e.method || '', e.ref || '',
     e.followup ? 'Yes' : 'No', e.followupNote || ''
