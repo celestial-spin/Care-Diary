@@ -781,7 +781,7 @@
     <div class="header-title-wrap">
       <h1 id="header-title">Care Diary</h1>
       <div class="subtitle" id="header-subtitle">Loading…</div>
-      <div style="font-size:10px;opacity:0.4;font-family:monospace">v9</div>
+      <div style="font-size:10px;opacity:0.4;font-family:monospace">v10</div>
     </div>
   </div>
   <div class="header-actions">
@@ -1471,7 +1471,8 @@ window.applyFilters = function() {
     if (from && e.date < from) return false;
     if (to && e.date > to) return false;
     if (cat) {
-      const eCats = Array.isArray(e.category) ? e.category : [e.category];
+      const rawCats = e.categories || e.category;
+      const eCats = Array.isArray(rawCats) ? rawCats : [rawCats];
       if (!eCats.includes(cat)) return false;
     }
     if (fu === 'followup' && !e.followup) return false;
@@ -1530,8 +1531,9 @@ function renderEntryCard(e) {
   const dateStr = dt.toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short', year:'numeric' });
   const timeStr = e.time || '';
 
-  // Support both single category (string) and multiple categories (array) from v5
-  const cats = Array.isArray(e.category) ? e.category : (e.category ? [e.category] : ['other']);
+  // Support both field names: v5 uses 'categories' (plural array), v6 uses 'category' (singular)
+  const rawCats = e.categories || e.category;
+  const cats = Array.isArray(rawCats) ? rawCats : (rawCats ? [rawCats] : ['other']);
   const catPillsHtml = cats.map(c => {
     const cls = 'cat-' + (c || 'other');
     return `<span class="category-pill ${cls}">${catLabel(c)}</span>`;
@@ -1625,7 +1627,8 @@ window.openEditModal = function(id) {
   document.getElementById('e-who').value = entry.who || '';
   // Set category checkboxes
   document.querySelectorAll('input[name="e-cat"]').forEach(cb => cb.checked = false);
-  const eCats = Array.isArray(entry.category) ? entry.category : [entry.category];
+  const rawCats = entry.categories || entry.category;
+  const eCats = Array.isArray(rawCats) ? rawCats : [rawCats];
   eCats.forEach(c => {
     const cb = document.querySelector(`input[name="e-cat"][value="${c}"]`);
     if (cb) cb.checked = true;
@@ -1755,7 +1758,8 @@ function renderExportStats() {
 
   const cats = {};
   src.forEach(e => {
-    const eCats = Array.isArray(e.category) ? e.category : [e.category];
+    const rawCats = e.categories || e.category;
+    const eCats = Array.isArray(rawCats) ? rawCats : [rawCats];
     eCats.forEach(c => { cats[c] = (cats[c] || 0) + 1; });
   });
   const followups = src.filter(e => e.followup).length;
@@ -1814,7 +1818,7 @@ window.exportCSV = function() {
     'Notes','Organisation','Contact person','Method','Reference','Follow-up required','Follow-up action'];
 
   const rows = src.map(e => [
-    e.date, e.time, e.who, (Array.isArray(e.category) ? e.category : [e.category]).map(catLabel).join(', '), e.severity || '',
+    e.date, e.time, e.who, (Array.isArray(e.categories || e.category) ? (e.categories || e.category) : [e.categories || e.category]).map(catLabel).join(', '), e.severity || '',
     e.summary, e.notes || '',
     e.org || '', e.contactPerson || '', e.method || '', e.ref || '',
     e.followup ? 'Yes' : 'No', e.followupNote || ''
